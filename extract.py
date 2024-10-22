@@ -18,8 +18,7 @@ def get_year() -> int:
 
     if today > august_15:
         return current_year + 1
-    else:
-        return current_year
+    return current_year
 
 
 def get_team_urls(soup) -> list[str]:
@@ -53,13 +52,13 @@ def process_team(team_url: str, year: int) -> pd.DataFrame | None:
     """Returns a dataframe from a specific team."""
     team_name = get_team_name(team_url)
 
-    data = requests.get(team_url)
+    data = requests.get(team_url, timeout=20)
     time.sleep(15)  # To not exceed rate limit
     matches = pd.read_html(StringIO(data.text),
                            match="Scores & Fixtures")[0]
     soup = BeautifulSoup(data.text, 'html.parser')
     link = get_shooting_link(soup)
-    data = requests.get(f"https://fbref.com{link}")
+    data = requests.get(f"https://fbref.com{link}", timeout=20)
     time.sleep(15)  # To not exceed rate limit
     shooting = pd.read_html(StringIO(data.text), match="Shooting")[0]
     shooting.columns = shooting.columns.droplevel()
@@ -84,7 +83,7 @@ def collect_data() -> pd.DataFrame:
     standings_url = "https://fbref.com/en/comps/9/Premier-League-Stats"
 
     for year in years[:1]:
-        data = requests.get(standings_url)
+        data = requests.get(standings_url, timeout=20)
         time.sleep(15)  # To not exceed rate limit
         soup = BeautifulSoup(data.text, 'html.parser')
         team_urls = get_team_urls(soup)
