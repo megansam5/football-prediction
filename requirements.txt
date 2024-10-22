@@ -4,3 +4,6 @@ bs4
 pandas
 lxml
 html5lib
+scikit-learn
+pytest
+freezegun
